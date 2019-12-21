@@ -1,0 +1,9 @@
+[package]
+name = "drsearch"
+version = "0.1.0"
+authors = ["Rohit Sachdeva <growth@drinnovations.us>"]
+edition = "2018"
+
+[dependencies]
+structopt = "0.2.10"
+tempfile = "3"
