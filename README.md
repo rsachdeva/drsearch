@@ -39,15 +39,19 @@ error: The following required arguments were not provided:
 
 USAGE:
     drsearch <pattern> <path>
+
+There is also optional Parameter for Developers only.
+You can pass TraitStyle or GenericStyle to see implementation difference in action. Same results.
+Default is GenericStyle.
 ~~~~
 
-So please provide pattern and path
+So please provide pattern and path as these are required.
 
 
 ## As a rust developer, You can run directly from cargo
 
 ```
-cargo run "Debug" /myproject/src/main.rs
+cargo run "Debug" /myproject/src/main.rs TraitStyle
 ```
 
 ## Otherwise, for everyone else, assuming command 'drsearch' is in your PATH/Directory
