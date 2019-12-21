@@ -17,6 +17,7 @@ struct Cli {
     pattern: String,
     path: PathBuf,
     #[structopt(subcommand)]
+    // makes this command line positional argument optional
     style: Option<Command>,
 }
 
