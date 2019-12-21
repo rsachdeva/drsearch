@@ -63,14 +63,14 @@ fn main() {
     );
     let style = &cli.style.unwrap_or(Command::GenericStyle);
     println!("Style is `{:?}`", style);
-    find_matches(&cli, &mut std::io::stdout()).expect("Could not complete Search due to: ");
-
-    println!(
-        "--------------------------------------------------------------------------------------"
-    );
-    println!("Trait object style...same result");
-    find_matches_trait_object_style(&cli, &mut std::io::stdout())
-        .expect("Could not complete Search due to: ");
+    if let Command::TraitStyle = style {
+        println!("calling trait style");
+        find_matches_trait_object_style(&cli, &mut std::io::stdout())
+            .expect("Could not complete Search due to: ");
+    } else {
+        println!("calling genric style (default)");
+        find_matches(&cli, &mut std::io::stdout()).expect("Could not complete Search due to: ");
+    }
     println!(
         "--------------------------------------------------------------------------------------"
     );
