@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::io::Error;
 use std::io::Write;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -19,38 +20,25 @@ struct Cli {
     style: Option<Command>,
 }
 
-#[derive(Debug)]
-struct CustomError(String);
-
-impl From<std::io::Error> for CustomError {
-    fn from(other: std::io::Error) -> Self {
-        CustomError(other.to_string())
-    }
-}
-
-fn find_matches<W: Write>(cli: &Cli, writer: &mut W) -> Result<(), CustomError> {
-    let f = File::open(&cli.path)
-        .map_err(|err| CustomError(format!("Error reading `{:?}`: {:?}", cli.path, err)))?;
+fn find_matches<W: Write>(cli: &Cli, writer: &mut W) -> Result<(), Error> {
+    let f = File::open(&cli.path)?;
     let reader = BufReader::new(f);
     for line in reader.lines() {
-        let s = &line.map_err(|err| CustomError(format!("Error reading line `{:?}`", err)))?;
+        let s = line.unwrap();
         if s.contains(cli.pattern.as_str()) {
-            writeln!(writer, "{}", s)
-                .map_err(|err| CustomError(format!("Error writing `{:?}`", err)))?;
+            writeln!(writer, "{}", s)?;
         }
     }
     Ok(())
 }
 
-fn find_matches_trait_object_style(cli: &Cli, writer: &mut dyn Write) -> Result<(), CustomError> {
-    let f = File::open(&cli.path)
-        .map_err(|err| CustomError(format!("Error reading `{:?}`: {:?}", cli.path, err)))?;
+fn find_matches_trait_object_style(cli: &Cli, writer: &mut dyn Write) -> Result<(), Error> {
+    let f = File::open(&cli.path)?;
     let reader = BufReader::new(f);
     for line in reader.lines() {
-        let s = &line.map_err(|err| CustomError(format!("Error reading line `{:?}`", err)))?;
+        let s = line.unwrap();
         if s.contains(cli.pattern.as_str()) {
-            writeln!(writer, "{}", s)
-                .map_err(|err| CustomError(format!("Error writing `{:?}`", err)))?;
+            writeln!(writer, "{}", s)?
         }
     }
     Ok(())
