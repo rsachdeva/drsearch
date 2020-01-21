@@ -68,7 +68,7 @@ fn main() {
         find_matches_trait_object_style(&cli, &mut std::io::stdout())
             .expect("Could not complete Search due to: ");
     } else {
-        println!("calling genric style (default)");
+        println!("calling generic style (default)");
         find_matches(&cli, &mut std::io::stdout()).expect("Could not complete Search due to: ");
     }
     println!(
