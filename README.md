@@ -1,6 +1,8 @@
+![](https://github.com/rsachdeva/drsearch/workflows/Rust/badge.svg)
+
 ## FUNCTIONALITY
 
-Simple command 'drsearch'' to search for pattern in a file using Rust.
+Simple command 'drsearch' to search for pattern in a file using Rust.
 
 ## DOWNLOAD for Direct Usage
 
