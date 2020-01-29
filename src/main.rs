@@ -80,11 +80,8 @@ mod tests {
     const COULD_NOT_PROCESS: &str = "could not process find matches";
     const EXPECTED_RESULT: &[u8; 24] = b"lorem ipsum\nlorem ipsum\n";
 
-    fn tmp_named_file() -> NamedTempFile {
-        NamedTempFile::new().expect("new file could not be created")
-    }
-
-    fn setup_options(command_style: Command, file: &mut NamedTempFile) -> (Vec<u8>, Cli) {
+    fn setup_options(command_style: Command) -> (Vec<u8>, Cli, NamedTempFile) {
+        let mut file = NamedTempFile::new().expect("new file could not be created");
         writeln!(file, "lorem ipsum\ndolor sit amet\nlorem ipsum\n")
             .expect("could not write to file");
         let result = Vec::new();
@@ -93,26 +90,28 @@ mod tests {
             path: PathBuf::from(file.path()),
             style: Option::from(command_style),
         };
-        (result, cli)
+        (result, cli, file)
+    }
+
+    fn close_file(file: NamedTempFile) {
+        file.close().expect("file could not be closed");
     }
 
     #[test]
     fn test_matches_generic_compile_time_style() {
-        let mut file = tmp_named_file();
-        let (mut result, cli) = setup_options(Command::GenericStyle, &mut file);
+        let (mut result, cli, file) = setup_options(Command::GenericStyle);
 
         find_matches_generic_compile_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
-        file.close().expect("file could not be closed");
+        close_file(file);
         assert_eq!(result, EXPECTED_RESULT);
     }
 
     #[test]
     fn test_matches_trait_object_run_time_style() {
-        let mut file = tmp_named_file();
-        let (mut result, cli) = setup_options(Command::TraitStyle, &mut file);
+        let (mut result, cli, file) = setup_options(Command::TraitStyle);
 
         find_matches_trait_object_run_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
-        file.close().expect("new file could not be closed");
+        close_file(file);
         assert_eq!(result, EXPECTED_RESULT);
     }
 }
