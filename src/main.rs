@@ -78,7 +78,7 @@ mod tests {
     use tempfile::NamedTempFile;
 
     #[test]
-    fn test_matches() {
+    fn test_matches_generic_compile_time_style() {
         let mut file = NamedTempFile::new().expect("new file could not be created");
         writeln!(file, "lorem ipsum\ndolor sit amet\nlorem ipsum\n")
             .expect("could not write to file");
@@ -96,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn test_matches_trait_object_style() {
+    fn test_matches_trait_object_run_time_style() {
         let mut file = NamedTempFile::new().expect("new file could not be created");
         writeln!(file, "lorem ipsum\ndolor sit amet\nlorem ipsum\n")
             .expect("could not write to file");
