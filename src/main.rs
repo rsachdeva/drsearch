@@ -21,7 +21,10 @@ struct Cli {
     style: Option<Command>,
 }
 
-fn find_matches<W: Write>(cli: &Cli, writer: &mut W) -> Result<(), Error> {
+fn find_matches_generic_compile_time_style<W: Write>(
+    cli: &Cli,
+    writer: &mut W,
+) -> Result<(), Error> {
     let f = File::open(&cli.path)?;
     let reader = BufReader::new(f);
     for line in reader.lines() {
@@ -33,7 +36,10 @@ fn find_matches<W: Write>(cli: &Cli, writer: &mut W) -> Result<(), Error> {
     Ok(())
 }
 
-fn find_matches_trait_object_style(cli: &Cli, writer: &mut dyn Write) -> Result<(), Error> {
+fn find_matches_trait_object_run_time_style(
+    cli: &Cli,
+    writer: &mut dyn Write,
+) -> Result<(), Error> {
     let f = File::open(&cli.path)?;
     let reader = BufReader::new(f);
     for line in reader.lines() {
@@ -54,11 +60,12 @@ fn main() {
     println!("Style is `{:?}`", style);
     if let Command::TraitStyle = style {
         println!("calling trait style");
-        find_matches_trait_object_style(&cli, &mut std::io::stdout())
+        find_matches_trait_object_run_time_style(&cli, &mut std::io::stdout())
             .expect("Could not complete Search due to: ");
     } else {
         println!("calling generic style (default)");
-        find_matches(&cli, &mut std::io::stdout()).expect("Could not complete Search due to: ");
+        find_matches_generic_compile_time_style(&cli, &mut std::io::stdout())
+            .expect("Could not complete Search due to: ");
     }
     println!(
         "--------------------------------------------------------------------------------------"
@@ -78,11 +85,13 @@ mod tests {
 
         let mut result = Vec::new();
         let cli = Cli {
-            pattern: "lorem".to_string(),
+            //            pattern: "lorem".to_string(),
+            pattern: str::to_string("lorem"),
             path: PathBuf::from(file.path()),
             style: Option::from(Command::TraitStyle),
         };
-        find_matches(&cli, &mut result).expect("could not process find matches");
+        find_matches_generic_compile_time_style(&cli, &mut result)
+            .expect("could not process find matches");
         assert_eq!(result, b"lorem ipsum\nlorem ipsum\n");
     }
 
@@ -98,7 +107,8 @@ mod tests {
             path: PathBuf::from(file.path()),
             style: Option::from(Command::TraitStyle),
         };
-        find_matches_trait_object_style(&cli, &mut result).expect("could not process find matches");
+        find_matches_trait_object_run_time_style(&cli, &mut result)
+            .expect("could not process find matches");
         assert_eq!(result, b"lorem ipsum\nlorem ipsum\n");
     }
 }
