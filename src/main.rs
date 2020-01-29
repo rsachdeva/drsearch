@@ -102,6 +102,7 @@ mod tests {
         let (mut result, cli) = setup_options(Command::GenericStyle, &mut file);
 
         find_matches_generic_compile_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        file.close().expect("file could not be closed");
         assert_eq!(result, EXPECTED_RESULT);
     }
 
@@ -111,6 +112,7 @@ mod tests {
         let (mut result, cli) = setup_options(Command::TraitStyle, &mut file);
 
         find_matches_trait_object_run_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        file.close().expect("new file could not be closed");
         assert_eq!(result, EXPECTED_RESULT);
     }
 }
