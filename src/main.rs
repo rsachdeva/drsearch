@@ -77,38 +77,36 @@ mod tests {
     use super::*;
     use tempfile::NamedTempFile;
 
-    #[test]
-    fn test_matches() {
+    const COULD_NOT_PROCESS: &str = "could not process find matches";
+    const EXPECTED_RESULT: &[u8; 24] = b"lorem ipsum\nlorem ipsum\n";
+
+    fn setup_options(command_style: Command) -> (Vec<u8>, Cli, NamedTempFile) {
         let mut file = NamedTempFile::new().expect("new file could not be created");
         writeln!(file, "lorem ipsum\ndolor sit amet\nlorem ipsum\n")
             .expect("could not write to file");
-
-        let mut result = Vec::new();
+        let result = Vec::new();
         let cli = Cli {
             //            pattern: "lorem".to_string(),
             pattern: str::to_string("lorem"),
             path: PathBuf::from(file.path()),
-            style: Option::from(Command::TraitStyle),
+            style: Option::from(command_style),
         };
-        find_matches_generic_compile_time_style(&cli, &mut result)
-            .expect("could not process find matches");
-        assert_eq!(result, b"lorem ipsum\nlorem ipsum\n");
+        (result, cli, file)
     }
 
     #[test]
-    fn test_matches_trait_object_style() {
-        let mut file = NamedTempFile::new().expect("new file could not be created");
-        writeln!(file, "lorem ipsum\ndolor sit amet\nlorem ipsum\n")
-            .expect("could not write to file");
+    fn test_matches_generic_compile_time_style() {
+        let (mut result, cli, _file) = setup_options(Command::GenericStyle);
 
-        let mut result = Vec::new();
-        let cli = Cli {
-            pattern: "lorem".to_string(),
-            path: PathBuf::from(file.path()),
-            style: Option::from(Command::TraitStyle),
-        };
-        find_matches_trait_object_run_time_style(&cli, &mut result)
-            .expect("could not process find matches");
-        assert_eq!(result, b"lorem ipsum\nlorem ipsum\n");
+        find_matches_generic_compile_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        assert_eq!(result, EXPECTED_RESULT);
+    }
+
+    #[test]
+    fn test_matches_trait_object_run_time_style() {
+        let (mut result, cli, _file) = setup_options(Command::TraitStyle);
+
+        find_matches_trait_object_run_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        assert_eq!(result, EXPECTED_RESULT);
     }
 }
