@@ -77,6 +77,9 @@ mod tests {
     use super::*;
     use tempfile::NamedTempFile;
 
+    const COULD_NOT_PROCESS: &str = "could not process find matches";
+    const EXPECTED_RESULT: &[u8; 24] = b"lorem ipsum\nlorem ipsum\n";
+
     fn setup_options(command_style: Command) -> (Vec<u8>, Cli, NamedTempFile) {
         let mut file = NamedTempFile::new().expect("new file could not be created");
         writeln!(file, "lorem ipsum\ndolor sit amet\nlorem ipsum\n")
@@ -95,17 +98,15 @@ mod tests {
     fn test_matches_generic_compile_time_style() {
         let (mut result, cli, _file) = setup_options(Command::GenericStyle);
 
-        find_matches_generic_compile_time_style(&cli, &mut result)
-            .expect("could not process find matches");
-        assert_eq!(result, b"lorem ipsum\nlorem ipsum\n");
+        find_matches_generic_compile_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        assert_eq!(result, EXPECTED_RESULT);
     }
 
     #[test]
     fn test_matches_trait_object_run_time_style() {
         let (mut result, cli, _file) = setup_options(Command::TraitStyle);
 
-        find_matches_trait_object_run_time_style(&cli, &mut result)
-            .expect("could not process find matches");
-        assert_eq!(result, b"lorem ipsum\nlorem ipsum\n");
+        find_matches_trait_object_run_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        assert_eq!(result, EXPECTED_RESULT);
     }
 }
