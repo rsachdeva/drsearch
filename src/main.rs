@@ -97,13 +97,23 @@ mod tests {
         file.close().expect("file could not be closed");
     }
 
-    #[test]
-    fn test_matches_generic_compile_time_style() {
-        let (mut result, cli, file) = setup_options(Command::GenericStyle);
+    fn matches<F>(command: Command, test_fn: F)
+    where
+        F: Fn(&Cli, &mut Vec<u8>) -> Result<(), Error>,
+    {
+        let (mut result, cli, file) = setup_options(command);
 
-        find_matches_generic_compile_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        test_fn(&cli, &mut result).expect(COULD_NOT_PROCESS);
         close_file(file);
         assert_eq!(result, EXPECTED_RESULT);
+    }
+
+    #[test]
+    fn test_matches_generic_compile_time_style() {
+        matches(
+            Command::GenericStyle,
+            find_matches_generic_compile_time_style,
+        )
     }
 
     #[test]
