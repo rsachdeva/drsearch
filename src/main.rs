@@ -80,48 +80,48 @@ mod tests {
     const COULD_NOT_PROCESS: &str = "could not process find matches";
     const EXPECTED_RESULT: &[u8; 24] = b"lorem ipsum\nlorem ipsum\n";
 
-    fn setup_options(command_style: Command) -> (Vec<u8>, Cli, NamedTempFile) {
+    fn setup_options(command_style: Command) -> (Cli, NamedTempFile) {
         let mut file = NamedTempFile::new().expect("new file could not be created");
         writeln!(file, "lorem ipsum\ndolor sit amet\nlorem ipsum\n")
             .expect("could not write to file");
-        let result = Vec::new();
         let cli = Cli {
             pattern: str::to_string("lorem"),
             path: PathBuf::from(file.path()),
             style: Option::from(command_style),
         };
-        (result, cli, file)
+        (cli, file)
     }
 
     fn close_file(file: NamedTempFile) {
         file.close().expect("file could not be closed");
     }
 
-    fn matches<F>(command: Command, test_fn: F)
+    fn matches<F>(command: Command, mut test_fn: F)
     where
-        F: Fn(&Cli, &mut Vec<u8>) -> Result<(), Error>,
+        F: FnMut(&Cli),
     {
-        let (mut result, cli, file) = setup_options(command);
-
-        test_fn(&cli, &mut result).expect(COULD_NOT_PROCESS);
+        let (cli, file) = setup_options(command);
+        test_fn(&cli);
         close_file(file);
-        assert_eq!(result, EXPECTED_RESULT);
     }
 
     #[test]
     fn test_matches_generic_compile_time_style() {
-        matches(
-            Command::GenericStyle,
-            find_matches_generic_compile_time_style,
-        )
+        let mut result = Vec::new();
+        let generic_fn = |cli: &Cli| {
+            find_matches_generic_compile_time_style(cli, &mut result).expect(COULD_NOT_PROCESS)
+        };
+        matches(Command::GenericStyle, generic_fn);
+        assert_eq!(result, EXPECTED_RESULT);
     }
 
     #[test]
     fn test_matches_trait_object_run_time_style() {
-        let (mut result, cli, file) = setup_options(Command::TraitStyle);
-
-        find_matches_trait_object_run_time_style(&cli, &mut result).expect(COULD_NOT_PROCESS);
-        close_file(file);
+        let mut result = Vec::new();
+        let trait_fn = |cli: &Cli| {
+            find_matches_trait_object_run_time_style(cli, &mut result).expect(COULD_NOT_PROCESS)
+        };
+        matches(Command::TraitStyle, trait_fn);
         assert_eq!(result, EXPECTED_RESULT);
     }
 }
